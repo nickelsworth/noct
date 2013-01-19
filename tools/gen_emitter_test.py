@@ -1,16 +1,15 @@
 """
-I was attempting to generate StringTemplate tests from the grammar tests.
-This was a nice try, but it doesn't work yet. :/
+I was attempting to generate StringTemplate tests from the grammar
+tests.  This was a nice try, but it doesn't work yet. :/
 
-One problem is that it generates tests for tokens, which gunit doesn't like..
-There's only one though (Ident) so I added the KEEP/SKIP states to skip those
-rules.
+One problem is that it generates tests for tokens, which gunit doesn't
+like..  There's only one though (Ident) so I added the KEEP/SKIP
+states to skip those rules.
 
 Even so... It now runs, but gunit can't find the templates. :/
 """
 
 import os, re, string
-os.chdir("r:/.gen/")
 
 
 def read_block(lines):
@@ -20,8 +19,6 @@ def read_block(lines):
         buff.append(line)
         line = lines.next()
     return "\n".join(buff)
-  
-
 
 
 KEEP, SKIP = 0, 1
@@ -32,9 +29,9 @@ def translate(out, tree_test):
     lines = iter(open(tree_test).read().split("\n"))
 
     for line in lines:
-        
+
         line = line.strip()
-        
+
         # comments
         if line.startswith("//"):
             out.write(line + "\n")
@@ -42,7 +39,7 @@ def translate(out, tree_test):
         # bad syntax (we don't test these)
         elif line.count("FAIL"):
             pass
-        
+
 
         # rule names
         elif line.endswith(":"):
@@ -59,7 +56,7 @@ def translate(out, tree_test):
             if line.startswith("<<"):
                 block = read_block(lines)
                 out.write('<<\n{0}\n>>\n->\n<<{0}>>\n'.format(block))
-                
+
             # rules
             elif line.startswith('"'):
                 head = None
@@ -75,8 +72,8 @@ def translate(out, tree_test):
             elif line.count("->"):
                 pass
 
-
-out = open("OberonEmitter.gunit", "w")
-out.write("gunit OberonEmitter walks Oberon07;\n")
-translate(out, "r:/.gen/Oberon07.gunit")
-out.close()
+if __name__=="__main__":
+    out = open(".gen/OberonEmitter.gunit", "w")
+    out.write("gunit OberonEmitter walks Oberon07;\n")
+    translate(out, "test/Oberon07.gunit")
+    out.close()
