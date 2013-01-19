@@ -6,22 +6,22 @@
 #
 #--------------------------------------------------------------------------
 JDK        = /usr/src/jdk1.7.0_10
-JAVA       = $(JDK)/bin/java
-JAVAC      = $(JDK)/bin/javac
-
 GEN        = .gen
+
 antlrjar3  = jars/antlr-3.4-complete.jar
 CLASSPATH  = "$(antlrjar3):$(GEN)"
 
+JAVA       = $(JDK)/bin/java -cp $(CLASSPATH)
+JAVAC      = $(JDK)/bin/javac
 
-antlr3     = $(JAVA) -cp $(CLASSPATH) org.antlr.Tool -o $(GEN)
+antlr3     = $(JAVA) org.antlr.Tool -o $(GEN)
 gunit      = $(JAVA) org.antlr.gunit.Interp
 
 ob_g       = Oberon07.g
 
 
 # default arguments for "make emit":
-emit_mod   = tests/ReformatMe.mod
+emit_mod   = test/ReformatMe.mod
 emit_stg   = targets/Oberon.stg
 
 #--------------------------------------------------------------------------
@@ -38,7 +38,7 @@ clean:
 
 
 %.class: %.java
-	$(JAVAC) $<
+	$(JAVAC) -cp $(CLASSPATH) $<
 
 
 # these should be redundant now
@@ -80,9 +80,9 @@ $(GEN)/Pig.pas: oberon.emitter $(GEN)/Pascal.stg test/Pig.mod
 # shortcuts:
 
 oberon       : $(GEN)/Oberon07Parser.java
-oberon.bin   : $(GEN)/Oberon07Parser.class
+oberon.bin   : $(GEN)/Oberon07Parser.class $(GEN)/Oberon07Lexer.class
 oberon.test  : oberon.bin
-	$(gunit) $(GEN)/Oberon07.gunit
+	$(gunit) test/Oberon07.gunit
 
 oberon.emitter: $(GEN)/OberonEmitter.class
 java.emitter: $(GEN)/JavaEmitter.class
@@ -91,7 +91,7 @@ emit: oberon.emitter
 	$(JAVA) OberonEmitter $(emit_stg) < $(emit_mod)
 
 
-$(GEN)/OberonEmitter.gunit: tests/Oberon07.gunit tools/gen_emitter_test.py
+$(GEN)/OberonEmitter.gunit: test/Oberon07.gunit tools/gen_emitter_test.py
 	$(python) tools/gen_emitter_test.py
 
 emit.test : oberon.bin $(GEN)/OberonEmitter.gunit
