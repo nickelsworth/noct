@@ -1,0 +1,42 @@
+(* test for the pretty printer *)
+MODULE ReformatMe;
+  IMPORT Texts;
+
+CONST
+  gPub* = "Hello, ";
+  gPriv = "world!";
+  true  = TRUE;
+
+TYPE
+  List = POINTER TO List;
+        
+VAR
+  v : INTEGER;
+     
+TYPE
+  p = PROCEDURE(a:INT; b:INT): INT;
+   
+CONST
+  space = 20X;
+         
+TYPE
+  ListDesc = RECORD
+    data : String;
+    next : List
+  END;    
+
+PROCEDURE Hello;
+  VAR
+    inHere : BOOLEAN;
+    PROCEDURE nested: BOOLEAN;
+      RETURN TRUE
+    END nested;
+  BEGIN
+    Write(gPub); 
+    Write(gPriv)
+  RETURN TRUE
+END Hello;
+
+BEGIN
+  Hello
+END ReformatMe.
