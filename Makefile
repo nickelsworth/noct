@@ -1,10 +1,10 @@
-#=[ configuration ]========================================================
+#=[ configuration ]=============================================
 #
 # You can override these on the command line. Example:
 #
 #     $ make emit emit.mod=/r/oberon/  emit.stg=.gen/Java.stg
 #
-#--------------------------------------------------------------------------
+#---------------------------------------------------------------
 JDK        = /usr/src/jdk1.7.0_10
 GEN        = .gen
 
@@ -30,7 +30,7 @@ ob_g       = Oberon07.g
 emit_mod   = test/ReformatMe.mod
 emit_stg   = targets/Oberon.stg
 
-#--------------------------------------------------------------------------
+#---------------------------------------------------------------
 
 # default rule:
 main: init
@@ -40,6 +40,9 @@ main: init
 	@echo "-----------      -----------------------------------"
 	@echo "oberon.test      run the test suite"
 	@echo "clean            remove generated code from $(GEN)/"
+	@echo 
+	@echo "hello.java       'hello world' unit for java"
+	@echo "pig.java         pig latin example for java"
 	@echo 
 	@echo "hello.pas        'hello world' unit for pascal"
 	@echo "pig.pas          pig latin example for pascal"
@@ -77,6 +80,18 @@ $(GEN)/OberonEmitter.java: OberonEmitter.g $(GEN)/Oberon07Parser.java
 	$(antlr3) OberonEmitter.g
 
 
+
+# java backend:
+
+$(GEN)/%.java: test/%.mod oberon.emitter targets/Java.stg
+	$(JAVA) OberonEmitter targets/Java.stg < $< | tail -n +1 > $@
+	cat $@
+
+hello.java: $(GEN)/Hello.java
+	$(FPC) $<
+
+pig.java : $(GEN)/Pig.java
+	$(FPC) $<
 
 # pascal backend:
 
