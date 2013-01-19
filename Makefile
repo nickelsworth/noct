@@ -8,6 +8,12 @@
 JDK        = /usr/src/jdk1.7.0_10
 GEN        = .gen
 
+# free pascal:
+FPC        = fpc
+
+PYTHON     = /usr/bin/python
+
+
 antlrjar3  = jars/antlr-3.4-complete.jar
 CLASSPATH  = "$(antlrjar3):$(GEN)"
 
@@ -15,7 +21,7 @@ JAVA       = $(JDK)/bin/java -cp $(CLASSPATH)
 JAVAC      = $(JDK)/bin/javac
 
 antlr3     = $(JAVA) org.antlr.Tool -o $(GEN)
-gunit      = $(JAVA) org.antlr.gunit.Interp
+GUNIT      = $(JAVA) org.antlr.gunit.Interp
 
 ob_g       = Oberon07.g
 
@@ -27,15 +33,30 @@ emit_stg   = targets/Oberon.stg
 #--------------------------------------------------------------------------
 
 # default rule:
-main: oberon.test
+main: init
+	@echo "available targets:"
+	@echo
+	@echo "target           purpose"
+	@echo "-----------      -----------------------------------"
+	@echo "oberon.test      run the test suite"
+	@echo "clean            remove generated code from $(GEN)/"
+	@echo 
+	@echo "hello.pas        'hello world' unit for pascal"
+	@echo "pig.pas          pig latin example for pascal"
+	@echo "pascal           another pascal test"
+	@echo
+	@echo "emit.test        (BROKEN) oberon->oberon test suite"
+	@echo
+	@echo "Type target name after 'make' to run. Example:"
+	@echo '    $$ make hello.pas'
+	@echo
+
 
 init:
-	mkdir -p .gen
+	@mkdir -p .gen
 
 clean:
 	rm -f $(GEN)/*.java
-
-
 
 %.class: %.java
 	$(JAVAC) -cp $(CLASSPATH) $<
@@ -59,22 +80,18 @@ $(GEN)/OberonEmitter.java: OberonEmitter.g $(GEN)/Oberon07Parser.java
 
 # pascal backend:
 
+$(GEN)/%.pas: test/%.mod oberon.emitter targets/Pascal.stg
+	$(JAVA) OberonEmitter targets/Pascal.stg < $< | tail -n +1 > $@
+	cat $@
+
 pascal : $(GEN)/pascal.pas $(GEN)/BUILTINS.pas
-	$(fpc) $(GEN)/pascal.pas
+	$(FPC) $(GEN)/pascal.pas
 
-pig     : Pig.pas
-	$(fpc) $(GEN)/Pig.pas
+hello.pas : $(GEN)/Hello.pas
+	$(FPC) $<
+
 pig.pas : $(GEN)/Pig.pas
-	$(cat)  $(GEN)/Pig.pas
-
-$(GEN)/BUILTINS.pas: oberon.emitter $(GEN)/Pascal.stg test/BUILTINS.mod
-	$(JAVA) OberonEmitter $(GEN)/Pascal.stg < test/BUILTINS.mod | tail -n +1 >  $(GEN)/BUILTINS.pas
-
-$(GEN)/pascal.pas: oberon.emitter $(GEN)/Pascal.stg test/pascal.mod
-	$(JAVA) OberonEmitter $(GEN)/Pascal.stg < test/pascal.mod | tail -n +1 > $(GEN)/pascal.pas
-
-$(GEN)/Pig.pas: oberon.emitter $(GEN)/Pascal.stg test/Pig.mod
-	$(JAVA) OberonEmitter $(GEN)/Pascal.stg < test/Pig.mod | tail -n +1 > $(GEN)/Pig.pas
+	$(FPC) $<
 
 
 # shortcuts:
@@ -82,7 +99,7 @@ $(GEN)/Pig.pas: oberon.emitter $(GEN)/Pascal.stg test/Pig.mod
 oberon       : $(GEN)/Oberon07Parser.java
 oberon.bin   : $(GEN)/Oberon07Parser.class $(GEN)/Oberon07Lexer.class
 oberon.test  : oberon.bin
-	$(gunit) test/Oberon07.gunit
+	$(GUNIT) test/Oberon07.gunit
 
 oberon.emitter: $(GEN)/OberonEmitter.class
 java.emitter: $(GEN)/JavaEmitter.class
@@ -92,8 +109,8 @@ emit: oberon.emitter
 
 
 $(GEN)/OberonEmitter.gunit: test/Oberon07.gunit tools/gen_emitter_test.py
-	$(python) tools/gen_emitter_test.py
+	$(PYTHON) tools/gen_emitter_test.py
 
 emit.test : oberon.bin $(GEN)/OberonEmitter.gunit
-	$(gunit) $(GEN)/OberonEmitter.gunit
+	$(GUNIT) $(GEN)/OberonEmitter.gunit
 
