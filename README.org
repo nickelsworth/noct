@@ -1,0 +1,76 @@
+* =noct= : the Nickelsworth Oberon Compiler/Transpiler
+Copyright (c) 2013 Michal J. Wallace
+Available for use under the MIT/X11 License. (see file:LICENSE)
+
+* Overview : A Source-to-Source compiler for Oberon 07
+
+Strictly speaking, =noct= is a transpiler: it translates code written in Oberon-07 to the corresponding code in another language, such as java or pascal.
+
+This means that most of the "hard" work of compilation is done by the backend compilers. In fact, since =noct= relies on a third party parsing system ([[http://antlr.org/][antlr3]]), there is very little code to it at all.
+
+The main two files are:
+
+ - =Oberon07.g= :: the grammar definition. Antlr uses this to generate java code for a parser, which in turn builds up an [[http://en.wikipedia.org/wiki/Abstract_syntax_tree][abstract syntax tree]] of the input.
+ - =OberonEmitter.g= :: a "tree grammar". Antlr uses tree grammars to generate programs that walk the abstract syntax tree and process it in various ways. In this case, the process simply involves generating code.
+
+The code generator makes use of /templates/ - one for each target language. These are located in the =targets= directory, and are created with [[http://stringtemplate.org/][StringTemplate]], another tool by the creator of ANTLR.
+
+Since the grammar and emitter are complete, and reusable for the different backends, most of the work to be done here involves creating and updating templates.
+
+In addition, each target language requires the implementation of a small library, to provide the handful of primitives. See Section 10.2 in the language report for details.
+
+
+* About the source language: Oberon 07
+
+Oberon is a small procedural programming language created at [[http://www.oberon.ethz.ch/][ETH Zurich]] (the Swiss Federal Institute of Technology), primarily by [[http://en.wikipedia.org/wiki/Niklaus_Wirth][Dr Niklaus Wirth]], who also created the languages Pascal and Modula.
+
+Oberon is a successor to these languages, first created in 1986 as part of [[http://en.wikipedia.org/wiki/Oberon_operating_system][Project Oberon]], a (successful!) attempt to create a complete programming language and operating system from scratch.
+
+Since then, there have been various incarnations of the Oberon language. Oberon 07 is the latest, documented in the [[http://www.inf.ethz.ch/personal/wirth/Articles/Oberon/Oberon07.Report.pdf][Oberon07.Report.pdf]] ([[https://docs.google.com/file/d/1mEtXz9X1c92WHiBll8G0uyprcL85B6RExzTR4pCYuM5QpDmtw6C8KryWSyfd/edit][also readable online at google docs]]). The "07" is short for 2007, though the language report was revised again in 2011.
+
+Dr Wirth seems to have spent his career working pursuing simplicity. While other languages sprout new features as time goes by, Wirth has done his best to remove them.
+
+What remains is a very small, practical, imperative language.
+
+*Features of Oberon-07*:
+
+ - clear, readable syntax
+ - modules (for reuse and speedy compilation)
+ - garbage collection
+ - type extension (inheritance)
+
+The project Oberon book (and other publications related to Oberon) are now out of print, but the authors have been generous enough to release them for free in PDF form. You can find them at the [[http://www.ethoberon.ethz.ch/books.html][Oberon bibliography]]. 
+
+There are also a number of [[http://www.inf.ethz.ch/personal/wirth/Articles/Oberon.html][Oberon Articles]] at [[http://www.inf.ethz.ch/personal/wirth/][Dr Wirth's home page]].
+
+* Target Languages
+
+=noct= can translate Oberon-07 code to the following languages:
+
+| target      | status     | notes                                    |
+|-------------+------------+------------------------------------------|
+| Oberon      | working(?) | acts as a source code formatter          |
+| java        | working(?) |                                          |
+| [[http://freepascal.org/][free pascal]] | partial    |                                          |
+| [[http://retroforth.org/][retro]]       | planned    | because of its excellent [[http://retroforth.org/docs/The_Ngaro_Virtual_Machine.html][virtual machine]] |
+
+
+* Requirements
+
+Note: Java is the only real requirement. The others are optional, or used only for testing specific backends.
+
+- *java* :: The parser is written with ANTLR3, and the code generation templates are made with StringTemplate. These tools are both written in Java, and there is a small amount of Java code holding the two together.
+
+          The antlr 3.4 jar files are included here in the ~jars/~ directory, so you only need to install java.
+
+- make :: Not strictly required, but there is a makefile used for various project management tasks.
+
+- free pascal :: For testing the pascal backend, and for compiling the [[https://github.com/sabren/b4][pascal port of ngaro]] for use with the retroforth backend.
+
+* Project Status
+
+@tangentstorm wrote the code for =noct= in April 2012 as a prototype, then shifted focus to the virtual machine and a [[https://github.com/tangentstorm/PL0-Language-Tools][prototype PL/0-to-retroforth compiler in python]].
+
+In the time since this code was first written, new versions of ANTLR and StringTemplate were released. While the new versions are quite nice, they are a complete rewrite with a much different feature set, and there is (currently) no plan to upgrade this codebase to support them.
+
+The code for =noct= was released as open source on Jan 18, 2013, after a revival of the #oberon channel on irc.freenode.net.
