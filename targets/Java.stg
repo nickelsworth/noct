@@ -1,0 +1,244 @@
+
+group Java;
+
+// this is mostly for testing:
+emit(data) ::= "<data>"
+
+module(mod, imp, decs, beg) ::= <<
+
+
+
+
+// ----------------------------------------------------------------------------
+// !!! WARNING !!! WARNING !!! WARNING !!! WARNING !!!  WARNING !!! WARNING !!!
+// ----------------------------------------------------------------------------
+//
+//            This file is generated!     DO NOT MODIFY BY HAND!
+//
+// ----------------------------------------------------------------------------
+// !!! WARNING !!! WARNING !!! WARNING !!! WARNING !!!  WARNING !!! WARNING !!!
+// ----------------------------------------------------------------------------
+
+
+
+
+
+package oberon;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class <mod> /* implements OberonModule? */
+{
+    private HashMap $names = HashMap();
+
+    
+    
+    
+}
+
+>>
+
+
+import_stmt(mods) ::= <<
+IMPORT <mods; separator=", ">;
+
+>>
+
+import_as(mod, nick) ::= "<nick> := <mod>"
+
+
+    
+    
+
+consts(consts) ::= <<
+CONST
+  <consts; separator="\n">
+>>
+types(types) ::= <<
+TYPE
+  <types; separator="\n">
+>>
+
+vars(vars) ::= <<
+VAR
+  <vars; separator="\n">
+>>
+
+procedure(id, sig, rtyp, body, decs, beg, ret) ::= <<
+PROCEDURE <id><sig><rtyp>;
+                  <decs; separator="\n">
+<beg>
+  <ret>
+END <id>;
+>>
+
+signature(params) ::= <<
+(<params; separator="; ">)
+>>
+
+return_type(type) ::= " : <type>"
+
+var_param(param) ::= "VAR <param>"
+
+param(type, names) ::= <<
+<names; separator=", "> : <type>
+>>
+
+array_of(type) ::= "ARRAY OF <type>"
+
+begin(block) ::= <<
+BEGIN
+  <block>
+>>
+
+return_stmt(value)::= <<
+RETURN <value>
+>>
+
+assign(obj, expr) ::= "<obj> := <expr>"
+
+block(stmts) ::= <<
+<stmts; separator=";\n">
+>>
+
+pass() ::= ""
+
+if_stmt(conds, else_block) ::= <<
+<conds; separator="\nELS">
+<if (else_block)>
+ELSE
+  <else_block>
+<endif>
+END
+>>
+
+if_cond(expr, block) ::= <<
+IF <expr> THEN
+   <block>
+>>
+
+case_stmt(expr, cases) ::= <<
+CASE <expr> OF
+  <cases; separator="\n | ">
+END
+>>
+
+a_case(labels, block) ::= <<
+<labels; separator=", "> :
+  <block>
+>>
+
+while_stmt(cond, block, elifs) ::= <<
+WHILE <cond> DO
+  <block>
+<elifs>
+END
+>>
+
+elsif_do(expr, block) ::= <<
+ELSIF <expr> DO
+  <block>
+>>
+
+repeat_stmt(block, expr) ::= <<
+REPEAT
+  <block>
+UNTIL <expr>
+>>
+
+for_stmt(id, beg, end, step, block) ::= <<
+FOR <id> := <beg> TO <end><if (step)> BY <step><endif> DO
+  <block>
+END
+>>
+
+getattr(obj, attr) ::= "<obj>.<attr>"
+
+index(obj, keys) ::= <<
+<obj>[<keys; separator=", ">]
+>>
+
+deref(obj) ::= "<obj>^"
+
+type_guard(obj, wanted) ::= "<obj>(<wanted>)"
+
+parens(expr) ::= "(<expr>)"
+
+invoke(obj, args) ::= <<
+<obj><if (args)>(<args; separator=", ">)<endif>
+>>
+
+args(args) ::= <<
+( <args; separator=", "> )
+>>
+
+literal_hex(hex) ::= "<hex>"
+literal_int(int) ::= "<int>"
+literal_num(num) ::= "<num>"
+literal_str(str) ::= "<str>"
+literal_chr(chr) ::= "<chr>"
+
+literal_null() ::= "NIL"
+literal_true() ::= "TRUE"
+literal_false() ::= "FALSE"
+
+
+literal_set(members) ::= <<
+{<members; separator=", ">}
+>>
+
+range(lo, hi) ::= "<lo> .. <hi>"
+
+positive(expr) ::= "+<expr>"
+negative(expr) ::= "-<expr>"
+inverted(expr) ::= "~<expr>"
+
+op_eq(a, b) ::= "<a> = <b>"
+op_ne(a, b) ::= "<a> # <b>"
+op_lt(a, b) ::= "<a> \< <b>"
+op_gt(a, b) ::= "<a> \> <b>"
+op_le(a, b) ::= "<a> \<= <b>"
+op_ge(a, b) ::= "<a> \>= <b>"
+op_in(a, b) ::= "<a> IN <b>"
+op_is(a, b) ::= "<a> IS <b>"
+op_plus(a, b) ::= "<a> + <b>"
+op_minus(a, b) ::= "<a> - <b>"
+op_rdiv(a, b) ::= "<a> / <b>"
+op_times(a, b) ::= "<a> * <b>"
+op_div(a, b) ::= "<a> DIV <b>"
+op_mod(a, b) ::= "<a> MOD <b>"
+op_and(a, b) ::= "<a> AND <b>"
+op_or(a, b) ::= "<a> OR <b>"
+
+declare_type(name, structure) ::= <<
+<name> = <structure>;
+>>
+
+array_type(dims, of_type) ::= <<
+ARRAY <dims; separator=","> OF <of_type>
+>>
+
+record_type(base, fields) ::= <<
+RECORD <base>
+  <fields; separator="\n">
+END
+>>
+
+based_on(qual) ::= "(<qual>)"
+
+pointer_to(type) ::= "POINTER TO <type>"
+
+proc_type(sig, ret) ::= "PROCEDURE<sig><ret>"
+
+declare_const(name, value) ::= "<name> = <value>;"
+
+new_public(ident) ::= "<ident>*"
+
+qualident(mod, ident) ::= "<mod>.<ident>"
+
+declare(type, names, sym) ::= <<
+<names; separator=","> : <type>;
+>>
+
+ident(name) ::= "<name>"

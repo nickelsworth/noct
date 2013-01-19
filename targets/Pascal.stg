@@ -1,0 +1,239 @@
+
+group Pascal;
+
+// this is mostly for testing:
+emit(data) ::= "<data>"
+  
+ident(name) ::= "<name>"
+
+new_public(ident) ::= "<ident>"
+
+qualident(mod, ident) ::= "<mod>.<ident>"
+
+declare(type, names, sym) ::= <<
+<names; separator=","> : <type>;
+>>
+
+declare_const(name, value) ::= "<name> = <value>;"
+
+declare_type(name, structure) ::= <<
+<name> = <structure>;
+>>
+
+array_type(dims, of_type) ::= <<
+ARRAY <dims; separator=","> OF <of_type>
+>>
+
+
+record_type(base, fields) ::= <<
+OBJECT
+  <fields; separator="\n">
+END
+>>
+
+based_on(qual) ::= "(<qual>)"
+
+pointer_to(type) ::= "^<type>"
+
+proc_type(sig, ret) ::= <<
+<if (ret)>
+FUNCTION<sig><ret>
+<else>
+PROCEDURE<sig><ret>
+<endif>
+>>
+
+getattr(obj, attr) ::= "<obj>.<attr>"
+
+index(obj, keys) ::= <<
+<obj>[<keys; separator=", ">]
+>>
+
+deref(obj) ::= "<obj>^"
+
+type_guard(obj, wanted) ::= "<obj>(<wanted>)"
+
+parens(expr) ::= "(<expr>)"
+
+invoke(obj, args) ::= <<
+<obj><args>
+>>
+
+args(args) ::= <<
+<if (args)>( <args; separator=", "> )<else>()<endif>
+>>
+
+literal_hex(hex) ::= "<hex>"
+literal_int(int) ::= "<int>"
+literal_num(num) ::= "<num>"
+literal_str(str) ::= "<str>"
+literal_chr(chr) ::= "<chr>"
+
+literal_null() ::= "NIL"
+literal_true() ::= "TRUE"
+literal_false() ::= "FALSE"
+
+literal_set(members) ::= <<
+{<members; separator=", ">}
+>>
+
+range(lo, hi) ::= "<lo> .. <hi>"
+
+inverted(expr) ::= "NOT <expr>"
+
+positive(expr) ::= "+<expr>"
+negative(expr) ::= "-<expr>"
+
+op_ne(a, b) ::= "<a> \<\> <b>"
+op_and(a, b) ::= "<a> & <b>"
+
+op_eq(a, b) ::= "<a> = <b>"
+op_lt(a, b) ::= "<a> \< <b>"
+op_gt(a, b) ::= "<a> \> <b>"
+op_le(a, b) ::= "<a> \<= <b>"
+op_ge(a, b) ::= "<a> \>= <b>"
+op_in(a, b) ::= "<a> IN <b>"
+op_is(a, b) ::= "<a> IS <b>"
+op_add(a, b) ::= "<a> + <b>"
+op_sub(a, b) ::= "<a> - <b>"
+op_rat(a, b) ::= "<a> / <b>"
+op_mul(a, b) ::= "<a> * <b>"
+op_div(a, b) ::= "<a> DIV <b>"
+op_mod(a, b) ::= "<a> MOD <b>"
+op_or(a, b) ::= "<a> OR <b>"
+
+assign(obj, expr) ::= "<obj> := <expr>"
+
+block(stmts) ::= <<
+<stmts; separator=";\n">
+>>
+
+pass() ::= "{ pass }"
+
+if_stmt(conds, else_block) ::= <<
+<conds; separator="\nELS">
+<if (else_block)>
+ELSE BEGIN
+  <else_block>
+<endif>
+END
+>>
+
+if_cond(expr, block) ::= <<
+IF <expr> THEN BEGIN
+   <block>
+>>
+
+case_stmt(expr, cases) ::= <<
+CASE <expr> OF
+  <cases; separator="\n | ">
+END
+>>
+
+a_case(labels, block) ::= <<
+<labels; separator=", "> : 
+   BEGIN
+      <block>
+   END
+>>
+
+while_stmt(cond, block, elifs) ::= <<
+IF <cond> THEN
+  REPEAT
+     <block>
+  UNTIL NOT <cond>;
+<elifs>
+END
+>>
+
+elsif_do(expr, block) ::= <<
+ELSIF <expr> DO BEGIN
+  <block>
+END
+>>
+
+repeat_stmt(block, expr) ::= <<
+REPEAT
+  <block>
+UNTIL <expr>
+>>
+
+for_stmt(id, beg, end, step, block) ::= <<
+FOR <id> := <beg> TO <end><if (step)> BY <step><endif> DO BEGIN
+  <block>
+END
+>>
+
+consts(consts) ::= <<
+CONST
+  <consts; separator="\n">
+>>
+types(types) ::= <<
+TYPE
+  <types; separator="\n">
+>>
+
+vars(vars) ::= <<
+VAR
+  <vars; separator="\n">
+>>
+
+procedure(id, sig, rtyp, body, decs, beg, ret) ::= <<
+
+<if (rtyp)>
+FUNCTION <id><sig><rtyp>;
+<else>
+PROCEDURE <id><sig>;
+<endif>
+<decs; separator="\n">
+BEGIN
+<beg>
+<ret>
+END; { <id> }
+>>
+
+signature(params) ::= <<
+( <params; separator="; "> )
+>>
+
+return_type(type) ::= " : <type>"
+
+var_param(param) ::= "VAR <param>"
+
+param(type, names) ::= <<
+<names; separator=", "> : <type>
+>>
+
+array_of(type) ::= "ARRAY OF <type>"
+
+begin(block) ::= <<
+   <block>
+>>
+return_stmt(value)::= <<
+   <id> := <value>;
+>>
+
+module(mod, imp, decs, beg) ::= <<
+
+UNIT <mod>;
+
+INTERFACE
+<imp>
+
+IMPLEMENTATION
+
+<decs; separator="\n\n">
+
+BEGIN  
+<beg>
+END. { <mod> }
+
+>>
+
+
+import_stmt(mods) ::= <<
+USES <mods; separator=", ">;
+>>
+
+
+import_as(mod, nick) ::= "<mod>"
