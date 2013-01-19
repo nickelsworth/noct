@@ -1,0 +1,430 @@
+
+gunit Oberon07;
+
+Ident:
+"x"             -> (x)
+"scan"          -> (scan)
+"Oberon"        -> (Oberon)
+"GetSymbol"     -> (GetSymbol)
+"firstLetter"   -> (firstLetter)
+
+number:
+"1987"     OK //-> (INT 1987)
+"100H"     OK //-> (HEX 100)
+"12.3"     OK //-> (NUM 12.3)
+"4.567E8"  OK //-> (EXP 4.567 8)
+"c"        FAIL
+
+string:
+<<
+"OBERON"
+>>
+->
+(STRING "OBERON")
+
+<<
+"Don't worry!"
+>>
+-> (STRING "Don't worry!")
+
+<<
+22X
+>>
+-> (HEXCHAR 22X)
+
+qualident:
+"write"          -> "write"
+"Texts"          -> "Texts"
+"BUILTINS.WRITELN"   -> (. BUILTINS WRITELN)
+
+const_decl:
+"N = 100"                  -> (= N 100)
+"limit = 2*N -1"           -> (= limit (SUB (MUL 2 N) 1))
+"all = {0 .. WordSize-1}"  OK
+"name = \"Oberon\""        OK
+
+type_decl:
+"Table = ARRAY N OF REAL"
+OK
+
+<<
+nada = RECORD
+END
+>> ->
+(= nada RECORD)
+
+<<
+CenterNode = RECORD (Node)
+  name: ARRAY 32 OF CHAR;
+  subnode: Tree
+END
+>> ->
+(= CenterNode (RECORD (EXTENDS Node) (DECLARE (ARRAY CHAR 32) name) (DECLARE Tree subnode)))
+
+<<
+Node = RECORD
+   key: INTEGER;
+   left, right: Tree
+END
+>> OK
+
+"Tree = POINTER TO Node"
+OK
+
+"Function = PROCEDURE (x: INTEGER): INTEGER"
+OK
+
+
+record_type:
+<<
+RECORD
+  day, month, year: INTEGER
+END
+>> OK
+
+<<
+RECORD
+  name, firstname: ARRAY 32 OF CHAR;
+  age: INTEGER;
+  salary: REAL
+END
+>> OK
+
+var_decl:
+"i, j, k: INTEGER" -> (DECLARE INTEGER i j k)
+"x, y: REAL"       -> (DECLARE REAL x y)
+"p, q: BOOLEAN"    -> (DECLARE BOOLEAN p q)
+"s: SET"           -> (DECLARE SET s)
+"f: Function"      -> (DECLARE Function f)
+"t: Tree"          -> (DECLARE Tree t)
+
+"a: ARRAY 100 OF REAL"
+-> (DECLARE (ARRAY REAL 100) a)
+
+<<
+w: ARRAY 16 OF
+     RECORD
+       ch   : CHAR;
+       count : INTEGER
+     END
+>>
+-> (DECLARE (ARRAY (RECORD (DECLARE CHAR ch) (DECLARE INTEGER count)) 16) w)
+
+designator:
+"i" OK // (INTEGER)
+"a[i]" OK // (REAL)
+"w[3].ch" OK // (CHAR)
+"t.key" OK // (INTEGER)
+"t.left.right" OK // (Tree)
+
+chain:
+"a.b" -> (ATTR a b)
+  
+"a[b]" -> (INDEX a b)
+
+"a^" -> (DEREF a)
+
+"a!B" -> (GUARD B a)
+
+expr:
+"1987" OK // (INTEGER)
+"i DIV 3" OK // (INTEGER)
+"~p OR q" OK // (BOOLEAN)
+"(i+j) * (i-j)" OK // (INTEGER)
+"-{8, 9, 13}" OK // (SET)
+"a[i+j] * a[i-j]" OK // (REAL)
+"(0<=i) & (i<100)" OK // (BOOLEAN)
+"t.key = 0" OK // (BOOLEAN)
+"k IN {i .. j-1}" OK // (BOOLEAN)
+"t IS CenterNode" OK // (BOOLEAN)
+
+signed_term:
+"+1" -> (POS 1)
+"-1" -> (NEG 1)
+"1"  -> "1"
+
+"+a" -> (POS a)
+"-a" -> (NEG a)
+"a"  -> "a"
+
+expr:
+"a <= b" -> (<= a b)
+"+1 < -2" -> (< (POS 1) (NEG 2))
+"0 = 5" -> (= 0 5)
+
+simple:
+"a + b" -> (ADD a b)
+"a - b" -> (SUB a b)
+"a OR b" -> (OR a b)
+
+term:
+"a * b" -> (MUL a b)
+"a / b" -> (/ a b)
+"a DIV b" -> (DIV a b)
+"a MOD b" -> (MOD a b)
+"a & b" -> (& a b)
+
+set:
+"{}" -> "SET_LIT"
+"{0}" -> (SET_LIT 0)
+"{0,1,2}" -> (SET_LIT 0 1 2)
+"{0 .. 2}" -> (SET_LIT (.. 0 2))
+
+element:
+"0" -> "0"
+"0 .. 2" -> (.. 0 2)
+
+expr:
+
+// relations are fine:
+"-1 < +1"
+-> (< (NEG 1) (POS 1))
+  
+// unary is okay on the first term of an addition: 
+"-1 + 2"
+-> (ADD (NEG 1) 2)
+
+"-1 - 2"
+-> (SUB (NEG 1) 2)
+
+ // but not on the second term:
+"1 + -2"  FAIL
+
+"1 + (-1)"
+-> (ADD 1 (GROUP (NEG 1)))
+
+// with multiplication, it binds to the whole term
+"-1 * a"
+-> (NEG (MUL 1 a))
+
+"a * -1" FAIL
+
+"a * (-1)"
+-> (MUL a (GROUP (NEG 1)))
+
+// the not operator, on the other hand, works as I expect:
+"~1 * ~2"
+-> (MUL (NOT 1) (NOT 2))
+  
+expr:
+"Math.SQRT(x*x + y*y)"
+-> (INVOKE (ATTR Math SQRT) (ARGS (ADD (MUL x x) (MUL y y))))
+
+factor:
+"a(0)" -> (INVOKE a (ARGS 0))
+"INC(x)" -> (INVOKE INC (ARGS x))
+
+assign:
+"i := 0"
+-> (ASSIGN i 0)
+
+"p := i = j"
+-> (ASSIGN p (= i j))
+
+"x := FLT(i + 1)"
+-> (ASSIGN x (INVOKE FLT (ARGS (ADD i 1))))
+
+"k := (i + j) DIV 2"
+-> (ASSIGN k (DIV (GROUP (ADD i j)) 2))
+
+"f := log2"
+-> (ASSIGN f log2)
+
+"s := {2, 3, 5, 7, 11, 13}"
+-> (ASSIGN s (SET_LIT 2 3 5 7 11 13))
+
+"a[i] := (x+y) * (x-y)"
+-> (ASSIGN (INDEX a i) (MUL (GROUP (ADD x y)) (GROUP (SUB x y))))
+
+"t.key := i"
+-> (ASSIGN (ATTR t key) i)
+
+"w[i+1].ch := \"A\""
+-> (ASSIGN (ATTR (INDEX w (ADD i 1)) ch) (STRING "A"))
+
+invoke:
+"noParens"   -> (INVOKE noParens)
+"parens()"   -> (INVOKE parens ARGS)
+"arg(0)"     -> (INVOKE arg (ARGS 0))
+"args(0, 1)" -> (INVOKE args (ARGS 0 1))
+
+if_stmt:
+"IF TRUE THEN END" -> (IF (COND TRUE PASS))
+  
+if_stmt:
+<<
+IF x < 0 THEN 
+   x := -x
+END
+>> ->
+(IF (COND (< x 0) (BLOCK (ASSIGN x (NEG x)))))
+  
+if_stmt:
+<<
+IF (ch >= "A") & (ch <= "Z") THEN
+   ReadIdentifier
+ELSIF (ch >= "0") & (ch <= "9") THEN
+   ReadNumber
+ELSIF ch = 22X THEN
+   ReadString
+END
+>> OK
+
+case_stmt:
+<<
+CASE k OF
+   0: x := x + y
+ | 1: x := x - y
+ | 2: x := x * y
+ | 3: x := x / y
+END
+>> OK
+
+while_stmt:
+<<
+WHILE j < 10 DO
+  j := j + 1;
+END
+>> ->
+(WHILE (< j 10) (BLOCK (ASSIGN j (ADD j 1))))
+
+<<
+WHILE (t # NIL) & (t.key # i) DO
+  t := t.left
+END
+>> OK
+
+<<
+WHILE m > n DO
+   m := m - n
+ELSIF n > m DO
+   n := n - m
+END
+>> OK
+
+repeat_stmt:
+<<
+   REPEAT
+      i := i + 1
+   UNTIL i = 10
+>>
+-> (REPEAT (BLOCK (ASSIGN i (ADD i 1))) UNTIL (= i 10))
+
+proc_decl:
+<<
+PROCEDURE empty;
+END empty;
+>> -> 
+(PROCEDURE empty)
+
+<<
+PROCEDURE begin;
+BEGIN
+END begin
+>> -> 
+(PROCEDURE begin (BEGIN PASS))
+
+<<
+PROCEDURE iffy;
+BEGIN
+   IF TRUE THEN END
+END iffy;
+>> -> 
+(PROCEDURE iffy (BEGIN (BLOCK (IF (COND TRUE PASS)))))
+
+<<
+PROCEDURE nested : BOOLEAN;
+   PROCEDURE sub1 : BOOLEAN;
+      PROCEDURE sub2 : BOOLEAN;
+      BEGIN
+         RETURN FALSE
+      END sub2;
+      RETURN NOT(sub1)
+   END sub1;
+BEGIN
+   sub1();
+END nested;
+>> OK
+  
+<<
+PROCEDURE ReadInt(VAR x: INTEGER);
+VAR
+   i  : INTEGER;
+   ch : CHAR;
+BEGIN
+   i := 0;
+   Read(ch);
+   WHILE ("0" <= ch) & (ch <= "9") DO
+      i := 10*i + (ORD(ch)-ORD("0")); Read(ch)
+   END ;
+   x := i
+END ReadInt
+>> OK
+
+<<
+PROCEDURE WriteInt(x: INTEGER); (* 0 <= x < 10^5 *)
+VAR
+   i   : INTEGER;
+   buf : ARRAY 5 OF INTEGER;
+BEGIN
+   i := 0;
+   REPEAT
+      buf[i] := x MOD 10;
+      x := x DIV 10;
+      INC(i)
+   UNTIL x = 0;
+   REPEAT
+      DEC(i); 
+      Write(CHR(buf[i] + ORD("0")))
+   UNTIL i = 0
+END WriteInt
+>> OK
+
+<<
+PROCEDURE log2(x: INTEGER): INTEGER;
+VAR
+  y: INTEGER; (* assume x>0 *)
+BEGIN
+  y := 0;
+  WHILE x > 1 DO x := x DIV 2; INC(y) END ;
+RETURN y END log2
+>>
+-> (PROCEDURE log2 (SIGNATURE (INTEGER x)) (RETURNS INTEGER) (VAR (DECLARE INTEGER y)) (BEGIN (BLOCK (ASSIGN y 0) (WHILE (> x 1) (BLOCK (ASSIGN x (DIV x 2)) (INVOKE INC (ARGS y)))))) (RETURN y))
+
+module:
+<<
+MODULE Empty;
+END Empty.
+>> -> (MODULE Empty)
+
+module:
+<<
+MODULE WithBegin;
+VAR x : INTEGER;
+BEGIN
+  Hello;
+  World(x);
+END WithBegin.
+>> -> (MODULE WithBegin (VAR (DECLARE INTEGER x)) (BEGIN (BLOCK (INVOKE Hello) (INVOKE World (ARGS x)))))
+
+module:
+<<
+MODULE Out; (* exported procedures: Public *)
+IMPORT Texts, Oberon;
+VAR
+   W : Texts.Writer;
+
+PROCEDURE Public*(ch: CHAR);
+BEGIN
+   Texts.Write(W, ch)
+END Public;
+
+PROCEDURE Private(ch: CHAR);
+BEGIN
+   Texts.Write(W, ch)
+END Private;
+
+BEGIN
+   Texts.OpenWriter(W)
+END Out.
+>> OK
