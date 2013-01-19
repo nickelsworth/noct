@@ -5,117 +5,95 @@
 #     $ make emit emit.mod=/r/oberon/  emit.stg=.gen/Java.stg
 #
 #--------------------------------------------------------------------------
-gen        = .gen    # output directory for generated files
 JDK        = /usr/src/jdk1.7.0_10
-JAVA       = "$(JDK)/bin/java"
-JAVAC      = "$(JDK)/bin/javac"
+JAVA       = $(JDK)/bin/java
+JAVAC      = $(JDK)/bin/javac
 
-antlrjar3  = lib/antlr-3.4-complete.jar
-javac      = $(JAVAC)
-java       = $(JAVA)
+GEN        = .gen
+antlrjar3  = jars/antlr-3.4-complete.jar
+CLASSPATH  = "$(antlrjar3):$(GEN)"
 
-antlr3      = $(java) -cp "$(antlrjar3);$(gen)" org.antlr.Tool -o $(gen)
-gunit      = $(java) org.antlr.gunit.Interp
 
+antlr3     = $(JAVA) -cp $(CLASSPATH) org.antlr.Tool -o $(GEN)
+gunit      = $(JAVA) org.antlr.gunit.Interp
+
+ob_g       = Oberon07.g
+
+
+# default arguments for "make emit":
+emit_mod   = tests/ReformatMe.mod
+emit_stg   = targets/Oberon.stg
 
 #--------------------------------------------------------------------------
 
 # default rule:
 main: oberon.test
 
+init:
+	mkdir -p .gen
+
 clean:
-	rm $(gen)/*.java
-
-# default arguments for "make emit":
-emit_mod   = ./oberon/test/ReformatMe.mod
-emit_stg   = $(gen)/Oberon.stg
-
-# command line tools:
-
-javac:
-	$(javac)
-gunit:
-	$(gunit)
-
-# oberon stuff:
+	rm -f $(GEN)/*.java
 
 
-$(gen)/Oberon07Parser.java: $(ob_g)
+
+%.class: %.java
+	$(JAVAC) $<
+
+
+# these should be redundant now
+# ------------------------------
+#$(GEN)/Oberon07Parser.class: $(GEN)/Oberon07Parser.java
+#	$(JAVAC) $(GEN)/Oberon07*.java
+#$(GEN)/OberonEmitter.class: $(GEN)/OberonEmitter.java
+#	$(JAVAC) $(GEN)/OberonEmitter.java
+
+
+$(GEN)/Oberon07Parser.java: $(ob_g)
 	$(antlr3) $(ob_g)
-$(gen)/Oberon07Parser.class: $(gen)/Oberon07Parser.java
-	$(javac) $(gen)/Oberon07*.java
 
-
-$(gen)/OberonEmitter.java: $(gen)/Oberon07Parser.java $(gen)/OberonEmitter.g 
-	$(antlr3) $(gen)/OberonEmitter.g
-$(gen)/JavaEmitter.java: $(gen)/OberonEmitter.java $(gen)/JavaEmitter.g
-	$(antlr3) $(gen)/JavaEmitter.g
-
-
-$(gen)/OberonEmitter.class: $(gen)/OberonEmitter.java
-	$(javac) $(gen)/OberonEmitter.java
-$(gen)/JavaEmitter.class: $(gen)/JavaEmitter.java
-	$(javac) $(gen)/JavaEmitter.java
+$(GEN)/OberonEmitter.java: OberonEmitter.g $(GEN)/Oberon07Parser.java
+	$(antlr3) OberonEmitter.g
 
 
 
 # pascal backend:
 
-pascal : $(gen)/pascal.pas $(gen)/BUILTINS.pas
-	$(fpc) $(gen)/pascal.pas
-
-pascal.pas : $(gen)/pascal.pas
-	$(cat)  $(gen)/pascal.pas
-
-builtins.pas : $(gen)/BUILTINS.pas
-	$(cat)  $(gen)/BUILTINS.pas
-
+pascal : $(GEN)/pascal.pas $(GEN)/BUILTINS.pas
+	$(fpc) $(GEN)/pascal.pas
 
 pig     : Pig.pas
-	$(fpc) $outdir/Pig.pas
-pig.pas : $(gen)/Pig.pas
-	$(cat)  $(gen)/Pig.pas
+	$(fpc) $(GEN)/Pig.pas
+pig.pas : $(GEN)/Pig.pas
+	$(cat)  $(GEN)/Pig.pas
 
-$(gen)/BUILTINS.pas: oberon.emitter $(gen)/Pascal.stg oberon/BUILTINS.mod
-	$(java) OberonEmitter $(gen)/Pascal.stg < oberon/BUILTINS.mod | $(tail) -n +1 >  $(gen)/BUILTINS.pas
+$(GEN)/BUILTINS.pas: oberon.emitter $(GEN)/Pascal.stg test/BUILTINS.mod
+	$(JAVA) OberonEmitter $(GEN)/Pascal.stg < test/BUILTINS.mod | tail -n +1 >  $(GEN)/BUILTINS.pas
 
-$(gen)/pascal.pas: oberon.emitter $(gen)/Pascal.stg oberon/test/pascal.mod
-	$(java) OberonEmitter $(gen)/Pascal.stg < oberon/test/pascal.mod | $(tail) -n +1 > $(gen)/pascal.pas
+$(GEN)/pascal.pas: oberon.emitter $(GEN)/Pascal.stg test/pascal.mod
+	$(JAVA) OberonEmitter $(GEN)/Pascal.stg < test/pascal.mod | tail -n +1 > $(GEN)/pascal.pas
 
-$(gen)/Pig.pas: oberon.emitter $(gen)/Pascal.stg work/Pig.mod
-	$(java) OberonEmitter $(gen)/Pascal.stg < work/Pig.mod | $(tail) -n +1 > $(gen)/Pig.pas
+$(GEN)/Pig.pas: oberon.emitter $(GEN)/Pascal.stg test/Pig.mod
+	$(JAVA) OberonEmitter $(GEN)/Pascal.stg < test/Pig.mod | tail -n +1 > $(GEN)/Pig.pas
 
 
 # shortcuts:
 
-
-oberon       : $(gen)/Oberon07Parser.java
-oberon.bin   : $(gen)/Oberon07Parser.class
+oberon       : $(GEN)/Oberon07Parser.java
+oberon.bin   : $(GEN)/Oberon07Parser.class
 oberon.test  : oberon.bin
-	$(gunit) $(gen)/Oberon07.gunit
+	$(gunit) $(GEN)/Oberon07.gunit
 
-oberon.emitter: $(gen)/OberonEmitter.class 
-java.emitter: $(gen)/JavaEmitter.class
+oberon.emitter: $(GEN)/OberonEmitter.class
+java.emitter: $(GEN)/JavaEmitter.class
 
 emit: oberon.emitter
-	$(java) OberonEmitter $(emit_stg) < $(emit_mod)
+	$(JAVA) OberonEmitter $(emit_stg) < $(emit_mod)
 
 
-# this is a complete hack to make gunit use the emitter:
-#$(gen)/OberonEmitterLexer.class : $(gen)/OberonEmitterLexer.java
-#	$(javac) $(gen)/OberonEmitterLexer.java
-#$(gen)/OberonEmitterLexer.java : $(gen)/Oberon07Lexer.java
-#	$(python) tools/gen_emitter_lexer.py
-#
-#$(gen)/OberonEmitterParser.class : $(gen)/OberonEmitterParser.java
-#	$(javac) $(gen)/OberonEmitterParser.java
-#$(gen)/OberonEmitterParser.java : $(gen)/Oberon07Parser.java
-#	$(python) tools/gen_emitter_lexer.py
-
-
-$(gen)/OberonEmitter.gunit : $(gen)/Oberon07.gunit tools/gen_emitter_test.py #$(gen)/OberonEmitterLexer.class $(gen)/OberonEmitterParser.class 
+$(GEN)/OberonEmitter.gunit: tests/Oberon07.gunit tools/gen_emitter_test.py
 	$(python) tools/gen_emitter_test.py
 
-emit.test  : oberon.bin $(gen)/OberonEmitter.gunit
-	$(gunit) $(gen)/OberonEmitter.gunit
+emit.test : oberon.bin $(GEN)/OberonEmitter.gunit
+	$(gunit) $(GEN)/OberonEmitter.gunit
 
