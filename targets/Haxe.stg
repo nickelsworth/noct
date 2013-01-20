@@ -1,0 +1,30 @@
+
+group Haxe;
+emit(data) ::= "<data>"
+module(mod, imp, decs, beg) ::= <<
+<imp>
+class <mod> {
+  <decs>
+  <beg>
+}
+>>
+ident(name) ::= "<name>"
+pass() ::= ""
+begin(block) ::= <<
+  public static function main() {
+     <block>
+  }
+>>
+block(stmts) ::= <<
+<stmts; separator="\n">
+>>
+import_stmt(mods) ::= <<
+import <mods; separator=", ">;
+>>
+invoke(obj, args) ::= <<
+<obj><args>
+>>
+
+args(args) ::= <<
+<if (args)>( <args; separator=", "> )<else>()<endif>
+>>

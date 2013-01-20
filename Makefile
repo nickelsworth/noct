@@ -40,10 +40,12 @@ main: init
 	@echo "-----------      -----------------------------------"
 	@echo "oberon.test      run the test suite"
 	@echo "clean            remove generated code from $(GEN)/"
-	@echo 
+	@echo
+	@echo "test.haxe	test the haxe backend"
+	@echo
 	@echo "hello.java       'hello world' unit for java"
 	@echo "pig.java         pig latin example for java"
-	@echo 
+	@echo
 	@echo "hello.pas        'hello world' unit for pascal"
 	@echo "pig.pas          pig latin example for pascal"
 	@echo "pascal           another pascal test"
@@ -65,13 +67,6 @@ clean:
 	$(JAVAC) -cp $(CLASSPATH) $<
 
 
-# these should be redundant now
-# ------------------------------
-#$(GEN)/Oberon07Parser.class: $(GEN)/Oberon07Parser.java
-#	$(JAVAC) $(GEN)/Oberon07*.java
-#$(GEN)/OberonEmitter.class: $(GEN)/OberonEmitter.java
-#	$(JAVAC) $(GEN)/OberonEmitter.java
-
 
 $(GEN)/Oberon07Parser.java: $(ob_g)
 	$(antlr3) $(ob_g)
@@ -79,6 +74,11 @@ $(GEN)/Oberon07Parser.java: $(ob_g)
 $(GEN)/OberonEmitter.java: OberonEmitter.g $(GEN)/Oberon07Parser.java
 	$(antlr3) OberonEmitter.g
 
+
+
+$(GEN)/%.hx: test/given/%.mod oberon.emitter targets/Haxe.stg
+	$(JAVA) OberonEmitter targets/Haxe.stg < $< | tail -n +1 > $@
+	cat $@
 
 
 # java backend:
@@ -117,7 +117,6 @@ oberon.test  : oberon.bin
 	$(GUNIT) test/Oberon07.gunit
 
 oberon.emitter: $(GEN)/OberonEmitter.class
-java.emitter: $(GEN)/JavaEmitter.class
 
 emit: oberon.emitter
 	$(JAVA) OberonEmitter $(emit_stg) < $(emit_mod)
@@ -128,4 +127,3 @@ $(GEN)/OberonEmitter.gunit: test/Oberon07.gunit tools/gen_emitter_test.py
 
 emit.test : oberon.bin $(GEN)/OberonEmitter.gunit
 	$(GUNIT) $(GEN)/OberonEmitter.gunit
-
