@@ -16,15 +16,21 @@ begin(block) ::= <<
   }
 >>
 block(stmts) ::= <<
-<stmts; separator="\n">
+<stmts; separator=";\n">;
 >>
 import_stmt(mods) ::= <<
 import <mods; separator=", ">;
 >>
 invoke(obj, args) ::= <<
-<obj><args>
+<obj><if (args)>( <args> )<else>( )<endif>
 >>
 
 args(args) ::= <<
-<if (args)>( <args; separator=", "> )<else>()<endif>
+<args; separator=", ">
 >>
+qualident(mod, ident) ::= "<mod>.<ident>"
+literal_str(str) ::= "<str>"
+literal_int(int) ::= "<int>"
+negative(expr) ::= "-<expr>"
+positive(expr) ::= "+<expr>"
+inverted(expr) ::= "!<expr>"
