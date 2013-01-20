@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# given a path to an oberon07 module, 
+# parse the module and dump the ast 
+# to stdout.
+#
+if [ "$1" == "" ]; then
+    echo "Usage: "
+    echo "      $0 filename"
+else
+    make parse < $1
+fi
+

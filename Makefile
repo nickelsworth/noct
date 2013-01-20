@@ -67,6 +67,14 @@ clean:
 	$(JAVAC) -cp $(CLASSPATH) $<
 
 
+# make parse < file   ( or  ./parse-oberon07 filename )
+parse: $(GEN)/DumpAST.class
+	@$(JAVA) DumpAST
+
+$(GEN)/DumpAST.class: tools/DumpAST.java
+	@cp tools/DumpAST.java $(GEN)
+	@$(JAVAC) -cp $(CLASSPATH) $<
+
 
 $(GEN)/Oberon07Parser.java: $(ob_g)
 	$(antlr3) $(ob_g)
