@@ -62,6 +62,7 @@ init:
 
 clean:
 	rm -f $(GEN)/*.java
+	find -name '*~' -delete
 
 %.class: %.java
 	$(JAVAC) -cp $(CLASSPATH) $<
