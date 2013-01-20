@@ -1,7 +1,7 @@
 MODULE T20IfThenElse;
 IMPORT Out;
 
-VAR p : BOOLEAN; i : integer;
+VAR p : BOOLEAN; i : INTEGER;
 BEGIN
 
   p := TRUE;
@@ -28,4 +28,4 @@ BEGIN
   IF i > 0 THEN Out.String( "+" ) ELSIF i < 0 THEN Out.String( "-" ) ELSE Out.String("0") END;
   Out.Ln;
 
-END T205IfThenElse.
+END T20IfThenElse.

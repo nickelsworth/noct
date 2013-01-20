@@ -1,21 +1,29 @@
 MODULE T11Variables;
 IMPORT Out;
 
-VAR x : INTEGER: msg : ARRAY 3 OF CHAR;
+CONST
+   abc="abc";    (* note: these strings are ARRAY 4 OF CHAR  *)
+   xyz="xyz";    (* because of an implicit CHR(0) marking the end. *)
+
+VAR
+   x : INTEGER;
+   msg : ARRAY 4 OF CHAR;
 BEGIN
 
   x := 0;
-  Out.Int( x ); Out.Ln;
+  Out.Int( x, 0 ); Out.Ln;
   x := 1;
-  Out.Int( 1 ); Out.Ln;
+  Out.Int( 1, 0 ); Out.Ln;
 
   x := 7; 
-  INC( x ); Out.Int( x ); Out.Ln;
-  DEC( x ); Out.Int( x ); Out.Ln;
+  INC( x, 3 ); Out.Int( x, 0 ); Out.Ln;
+  DEC( x, 2 ); Out.Int( x, 0 ); Out.Ln;
 
-  msg := "abc";
+  msg := abc;
   Out.String( msg ); Out.Ln;
-  msg := "xyz";
+  msg := xyz;
+  Out.String( msg ); Out.Ln;
+  msg := "123";
   Out.String( msg ); Out.Ln;
 
 END T11Variables.

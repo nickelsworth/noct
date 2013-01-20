@@ -3,9 +3,9 @@ IMPORT Out;
 
 PROCEDURE WriteLn( i : INTEGER );
 BEGIN
-  Out.Int( i );
+  Out.Int( i, 0 );
   Out.Ln;
-END Write;
+END WriteLn;
 
 PROCEDURE Next( i : INTEGER ) : INTEGER;
 BEGIN
@@ -14,7 +14,8 @@ END Next;
 
 PROCEDURE VarNext( i : INTEGER; VAR j : INTEGER );
 BEGIN
-END;
+  j := i + 1;
+END VarNext;
 
 VAR x : INTEGER;
 BEGIN

@@ -1,5 +1,5 @@
 MODULE T32Recursion;
-
+IMPORT Out;
 
 PROCEDURE Binary( number, digits : INTEGER );
   VAR place : INTEGER;
@@ -13,17 +13,17 @@ PROCEDURE Binary( number, digits : INTEGER );
        but we're starting with the lowest, we need to put the
        the recursive call in the middle. *)
     IF place > 0 THEN
-      cursor := cursor - 1;
+      place := place - 1;
       Helper;
     END;
     (* the above code recursively printed all the bits to our left,
        so now we can print our bit and return: *)
-    Out.Int( bit )
+    Out.Int( bit, 0 )
   END Helper;
 
 BEGIN
   place := digits;
-  helper;
+  Helper;
   Out.Ln;
 END Binary;
 

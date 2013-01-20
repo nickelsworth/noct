@@ -1,10 +1,10 @@
-PROCEDURE T31Nested;
+MODULE T31Nested;
 IMPORT Out;
 
 PROCEDURE Nested;
   PROCEDURE N1;
-    PROCEDURE N2
-      PROCEDURE N3
+    PROCEDURE N2;
+      PROCEDURE N3;
       BEGIN Out.String( "[ N3 ]" )
       END N3;
     BEGIN Out.String( "[ N2 " ); N3; Out.String( "]" )
