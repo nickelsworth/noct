@@ -138,7 +138,7 @@ new_ident
     ;
 
 qualident
-    : ^('.' a=ident b=ident)  -> qualident(mod={$a.st}, ident={$b.st})
+    : ^(DOT a=ident b=ident)  -> qualident(mod={$a.st}, ident={$b.st})
     | ident -> {$ident.st}
     ;
 
