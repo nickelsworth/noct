@@ -6,14 +6,14 @@ CONST
    xyz="xyz";    (* because of an implicit CHR(0) marking the end. *)
 
 VAR
-   x : INTEGER;
+   x, y : INTEGER;
    msg : ARRAY 4 OF CHAR;
 BEGIN
 
   x := 0;
   Out.Int( x, 0 ); Out.Ln;
-  x := 1;
-  Out.Int( 1, 0 ); Out.Ln;
+  y := 1;
+  Out.Int( y, 0 ); Out.Ln;
 
   x := 7; 
   INC( x, 3 ); Out.Int( x, 0 ); Out.Ln;

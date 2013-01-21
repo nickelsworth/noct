@@ -40,8 +40,20 @@ op_mul(a, b) ::= "<a> * <b>"
 op_div(a, b) ::= "Std.int( <a> / <b> )"
 op_mod(a, b) ::= "<a> % <b>"
 grouped(expr) ::= "( <expr> )"
+consts(consts) ::= "<consts>"
 declare_const(name, value) ::= <<
 static inline var <name> = <value>;
+
+>>
+declare(type, names, sym) ::= <<
+<names:{n|var <n>:<type>;}; separator="\n">
+>>
+vars(vars) ::= <<
+  <vars; separator="\n">
+>>
+assign(obj, expr) ::= "<obj> = <expr>"
+array_type(dims, of_type) ::= <<
+Array\<<of_type>\>
 >>
 consts(consts) ::= <<
 <consts; separator="\n">
