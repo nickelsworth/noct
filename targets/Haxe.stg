@@ -39,3 +39,10 @@ op_sub(a, b) ::= "<a> - <b>"
 op_mul(a, b) ::= "<a> * <b>"
 op_div(a, b) ::= "Std.int( <a> / <b> )"
 op_mod(a, b) ::= "<a> % <b>"
+grouped(expr) ::= "( <expr> )"
+declare_const(name, value) ::= <<
+static inline var <name> = <value>;
+>>
+consts(consts) ::= <<
+<consts; separator="\n">
+>>
