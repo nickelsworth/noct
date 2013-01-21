@@ -265,7 +265,7 @@ binop
 
 statement
     : a=assign -> {$a.st}
-    | v=invoke -> {$v.st}
+    | v=invoke_stmt -> {$v.st}
     | i=if_stmt -> {$i.st}
     | c=case_stmt -> {$c.st}
     | w=while_stmt -> {$w.st}
@@ -280,6 +280,11 @@ assign
 invoke
     : ^(INVOKE designator args?)  -> invoke(obj={$designator.st}, args={$args.st})
     ;
+
+invoke_stmt // same as above, but a different template, because of semicolon issues in haxe
+    : ^(INVOKE designator args?)  -> invoke_stmt(obj={$designator.st}, args={$args.st})
+    ;
+
 
 args
     : ^(ARGS exps+=expr*)                 -> args(args={$exps})

@@ -16,13 +16,17 @@ begin(block) ::= <<
   }
 >>
 block(stmts) ::= <<
-<stmts; separator=";\n">;
+<stmts; separator="\n">
 >>
 import_stmt(mods) ::= <<
 import <mods; separator=", ">;
 >>
 invoke(obj, args) ::= <<
 <obj><if (args)>( <args> )<else>( )<endif>
+>>
+
+invoke_stmt(obj, args) ::= <<
+<invoke(obj=obj, args=args)>;
 >>
 
 args(args) ::= <<
@@ -51,7 +55,7 @@ declare(type, names, sym) ::= <<
 vars(vars) ::= <<
   <vars; separator="\n">
 >>
-assign(obj, expr) ::= "<obj> = <expr>"
+assign(obj, expr) ::= "<obj> = <expr>;"
 array_type(dims, of_type) ::= <<
 Array\<<of_type>\>
 >>
@@ -81,11 +85,11 @@ op_ge(a, b) ::= "<a> \>= <b>"
 repeat_stmt(block, expr) ::= <<
 do {
   <block>
-} while ( !( <expr> ))
+} while ( !( <expr> ));
 >>
 for_stmt(id, beg, end, step, block) ::= <<
-<id> := <beg>;
-while ( <id> \<= <end> ) do
+<id> = <beg>;
+while ( <id> \<= <end> )
 {
     <block>
     <if (step)>
