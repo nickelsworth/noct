@@ -78,3 +78,20 @@ op_lt(a, b) ::= "<a> \< <b>"
 op_gt(a, b) ::= "<a> \> <b>"
 op_le(a, b) ::= "<a> \<= <b>"
 op_ge(a, b) ::= "<a> \>= <b>"
+repeat_stmt(block, expr) ::= <<
+do {
+  <block>
+} while ( !( <expr> ))
+>>
+for_stmt(id, beg, end, step, block) ::= <<
+<id> := <beg>;
+while ( <id> \<= <end> ) do
+{
+    <block>
+    <if (step)>
+    INC( <id>, <step> );
+    <else>
+    INC( <id>, 1 );
+    <endif>
+}
+>>
