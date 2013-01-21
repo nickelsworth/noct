@@ -3,17 +3,19 @@ group Haxe;
 emit(data) ::= "<data>"
 module(mod, imp, decs, beg) ::= <<
 <imp>
-class <mod> {
-  <decs>
-  <beg>
+class <mod>
+{
+    <decs;separator="\n">
+    public static function main()
+    {
+        <beg>
+    }
 }
 >>
 ident(name) ::= "<name>"
 pass() ::= ""
 begin(block) ::= <<
-  public static function main() {
-     <block>
-  }
+<block>
 >>
 block(stmts) ::= <<
 <stmts; separator="\n">
@@ -50,10 +52,10 @@ static inline var <name> = <value>;
 
 >>
 declare(type, names, sym) ::= <<
-<names:{n|var <n>:<type>;}; separator="\n">
+<names:{n|var <n> : <type>;}; separator="\n">
 >>
 vars(vars) ::= <<
-  <vars; separator="\n">
+<vars; separator="\n">
 >>
 assign(obj, expr) ::= "<obj> = <expr>;"
 array_type(dims, of_type) ::= <<
@@ -115,4 +117,25 @@ else if ( <cond> )
 {
     <block>
 }
+>>
+param(type, names) ::= <<
+<names; separator=", "> : <type>
+>>
+var_param(param) ::= "<param>"
+signature(params) ::= <<
+( <params; separator=", "> )
+>>
+
+procedure(id, sig, rtyp, body, decs, beg, ret) ::= <<
+static function <id><sig><rtyp>
+{
+    <decs; separator="\n">
+    <beg>
+    <ret>
+}
+>>
+
+return_type(type) ::= " : <type>"
+return_stmt(value)::= <<
+return <value>;
 >>

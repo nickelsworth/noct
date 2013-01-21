@@ -1,6 +1,8 @@
 MODULE T30Procedures;
 IMPORT Out;
 
+VAR x : INTEGER;
+
 PROCEDURE WriteLn( i : INTEGER );
 BEGIN
   Out.Int( i, 0 );
@@ -17,9 +19,8 @@ BEGIN
   j := i + 1;
 END VarNext;
 
-VAR x : INTEGER;
-BEGIN
 
+BEGIN
   x := 0;
   WriteLn( x );         (* 0 *)
   x := Next( x );   
