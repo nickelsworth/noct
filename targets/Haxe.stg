@@ -99,3 +99,20 @@ while ( <id> \<= <end> )
     <endif>
 }
 >>
+while_stmt(cond, block, elifs) ::= <<
+while (true)
+{
+    if ( <cond> )
+    {
+        <block>
+    }
+    <elifs;separator="\n">
+    else break;
+}
+>>
+elsif_do(cond, block) ::= <<
+else if ( <cond> )
+{
+    <block>
+}
+>>
