@@ -291,7 +291,7 @@ block
     ;
 
 if_stmt
-    : ^(IF conds+=if_cond+ el=block?)
+    : ^(IF conds+=if_cond+ el=else_block?)
         -> if_stmt(conds={$conds}, else_block={$el.st})
     ;
 
@@ -299,6 +299,9 @@ if_cond
     : ^(COND expr block)    -> if_cond(expr={$expr.st}, block={$block.st})
     ;
 
+else_block
+    : ^(ELSE block) -> {$block.st}
+    ;
 case_stmt
     : ^(CASE expr cases+=a_case) -> case_stmt(expr={$expr.st}, cases={$cases})
     ;

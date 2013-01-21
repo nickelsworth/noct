@@ -6,6 +6,7 @@ BEGIN
 
   p := TRUE;
   IF p THEN Out.String( "P" ) ELSE Out.String( "~P" ) END; Out.Ln;
+
   p := ~p;
   IF p THEN Out.String( "P" ) ELSE Out.String( "~P" ) END; Out.Ln;
 

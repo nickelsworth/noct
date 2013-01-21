@@ -55,6 +55,26 @@ assign(obj, expr) ::= "<obj> = <expr>"
 array_type(dims, of_type) ::= <<
 Array\<<of_type>\>
 >>
-consts(consts) ::= <<
-<consts; separator="\n">
+literal_true() ::= "TRUE"
+literal_false() ::= "FALSE"
+if_cond(expr, block) ::= <<
+if ( <expr> )
+{
+   <block>
+}
 >>
+if_stmt(conds, else_block) ::= <<
+<conds; separator="\nelse ">
+<if (else_block)>
+else
+{
+    <else_block>
+}
+<endif>
+>>
+op_eq(a, b) ::= "<a> == <b>"
+op_ne(a, b) ::= "<a> != <b>"
+op_lt(a, b) ::= "<a> \< <b>"
+op_gt(a, b) ::= "<a> \> <b>"
+op_le(a, b) ::= "<a> \<= <b>"
+op_ge(a, b) ::= "<a> \>= <b>"
