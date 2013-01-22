@@ -43,8 +43,13 @@ for f in $test/given/*.mod ; do
   name=${name/\.mod/}
 
   # let make figure out how to compile it
-  make $gen/$name.$ext   || exit
+  echo make $gen/$name.$ext
+  echo -e "\e[33m" # brown
+  make $gen/$name.$ext  | tail -n +2 || exit -1
+  echo -e "\e[0m" # normal
+  echo '[ press enter to run, ^C to terminate ]' ; read
 
+  echo -e "\e[36m" # cyan
   # now invoke it:
   case $1 in
      haxe)  haxe -cp $gen -cp targets/haxe/neko -x $name
@@ -55,5 +60,5 @@ for f in $test/given/*.mod ; do
         *)  echo "sorry, don't know how to run $1 yet."
         ;;
   esac
-  echo '[press enter]' ; read
+  echo -e "\e[0m" # normal
 done
