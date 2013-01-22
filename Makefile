@@ -84,10 +84,13 @@ $(GEN)/OberonEmitter.java: OberonEmitter.g $(GEN)/Oberon07Parser.java
 	$(antlr3) OberonEmitter.g
 
 
-
 $(GEN)/%.hx: test/given/%.mod oberon.emitter targets/Haxe.stg
-	$(JAVA) OberonEmitter targets/Haxe.stg < $< | tail -n +1 > $@
-	cat $@
+	@$(JAVA) OberonEmitter targets/Haxe.stg < $< | tail -n +1 > $@
+	@cat $@
+
+$(GEN)/%.rx: test/given/%.mod oberon.emitter targets/Retro.stg
+	@$(JAVA) OberonEmitter targets/Retro.stg < $< | tail -n +1 > $@
+	@cat $@
 
 
 # java backend:
