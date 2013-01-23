@@ -46,11 +46,10 @@ for f in $test/given/*.mod ; do
   echo make $gen/$name.$ext
   echo -e "\e[33m" # brown
   make $gen/$name.$ext  | tail -n +2 || exit -1
-  echo -e "\e[0m" # normal
-  echo '[ press enter to run, ^C to terminate ]' ; read
 
-  echo -e "\e[36m" # cyan
   # now invoke it:
+  clear
+  echo -e "\e[36m" # cyan
   case $1 in
      haxe)  haxe -cp $gen -cp targets/haxe/neko -x $name
             mv -f $name.n $gen
@@ -61,4 +60,9 @@ for f in $test/given/*.mod ; do
         ;;
   esac
   echo -e "\e[0m" # normal
+  echo "[ end of $name.$ext source was: ]"
+  echo -e "\e[33m" # brown
+  cat $gen/$name.$ext
+  echo -e "\e[0m" # normal
+  echo '[ press enter to continue, ^C to terminate ]' ; read
 done
