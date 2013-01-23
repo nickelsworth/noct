@@ -1,0 +1,26 @@
+
+chain: noct' ( compililation helpers for noct )
+
+( ~~ assembler, as in meta.rx / assembler.rx ~~~~~~~~~~~~~~~ )
+
+( vm: defines a new compiler word )
+: vm: ( n"- ) ( expects an opcode number on stack, will parse for name )
+   ` :        ( start new definition, parse for name )
+   ` ,        ( n-  write the opcode )
+;
+
+( ngaro opcodes )
+ 0 vm: nop,          1 vm: lit,          2 vm: dup,
+ 3 vm: drop,         4 vm: swap,         5 vm: push,
+ 6 vm: pop,          7 vm: loop,         8 vm: jump,
+ 9 vm: ret,         10 vm: >jump,       11 vm: <jump,
+12 vm: !jump,       13 vm: =jump,       14 vm: @,
+15 vm: !,           16 vm: +,           17 vm: -,
+18 vm: *,           19 vm: /mod,        20 vm: and,
+21 vm: or,          22 vm: xor,         23 vm: <<,
+24 vm: >>,          25 vm: 0;           26 vm: 1+,
+27 vm: 1-,          28 vm: in,          29 vm: out,
+30 vm: wait,
+
+  
+;chain

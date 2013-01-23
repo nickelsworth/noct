@@ -1,0 +1,144 @@
+
+group Retro;
+emit(data) ::= "<data>"
+module(mod, imp, decs, beg) ::= <<
+needs o07'
+<imp>
+chain: <mod>'
+{{
+  <decs>
+---reveal---
+  <beg>
+}}
+;chain
+: go clear ^<mod>'BEGIN bye ;
+go
+>>
+ident(name) ::= "<name>"
+pass() ::= ""
+begin(block) ::= <<
+: BEGIN                   
+  <block>
+;
+>>
+block(stmts) ::= <<
+<stmts; separator="\n">
+>>
+import_stmt(mods) ::= <<
+<mods:{ mod | needs <mod>' }; separator="\n"> 
+>>
+invoke(obj, args) ::= <<
+<if(args)><args> <endif><obj>
+>>
+
+invoke_stmt(obj, args) ::= <<
+<invoke(obj=obj, args=args)>
+>>
+
+args(args) ::= <<
+<args; separator=" ">
+>>
+qualident(mod, ident) ::= "^<mod>'<ident>"
+literal_str(str) ::= "<str>"
+literal_int(int) ::= "<int>"
+negative(expr) ::= "<expr> negate"
+positive(expr) ::= "<expr>"
+op_add(a, b) ::= "<a> <b> +"
+op_sub(a, b) ::= "<a> <b> -"
+op_mul(a, b) ::= "<a> <b> *"
+op_div(a, b) ::= "<a> <b> /"
+op_mod(a, b) ::= "<a> <b> mod"
+grouped(expr) ::= " <expr> "
+consts(consts) ::= "<consts>"
+declare_const(name, value) ::= <<
+^noct'CONST: <value> <name>
+
+>>
+declare(type, names, sym) ::= <<
+variables| <names:{n|<n>}; separator=" "> |
+>>
+vars(vars) ::= <<
+<vars; separator="\n">
+>>
+assign(obj, expr) ::= "<expr> <obj> !"
+array_type(dims, of_type) ::= <<
+Array\<<of_type>\>
+>>
+literal_true() ::= "TRUE"
+literal_false() ::= "FALSE"
+if_cond(expr, block) ::= <<
+<expr>
+[
+    <block>
+] ifTrue
+>>
+if_stmt(conds, else_block) ::= <<
+<conds; separator="\nelse ">
+<if (else_block)>
+else
+{
+    <else_block>
+}
+<endif>
+>>
+op_eq(a, b) ::= "<a> <b> ="
+op_ne(a, b) ::= "<a> <b> !="
+op_lt(a, b) ::= "<a> <b> \<"
+op_gt(a, b) ::= "<a> <b> \>"
+op_le(a, b) ::= "<a> <b> \<="
+op_ge(a, b) ::= "<a> <b> \>="
+repeat_stmt(block, expr) ::= <<
+repeat
+  <block>
+<expr> [ again ] [] if
+>>
+for_stmt(id, beg, end, step, block) ::= <<
+( FOR ) <id>
+( := ) <beg>
+( TO ) <end>
+( BY ) <step>
+( DO )
+[
+  <block>
+]
+( END ) FOR
+>>
+while_stmt(cond, block, elifs) ::= <<
+while (true)
+{
+    if ( <cond> )
+    {
+        <block>
+    }
+    <elifs;separator="\n">
+    else break;
+}
+>>
+elsif_do(cond, block) ::= <<
+else if ( <cond> )
+{
+    <block>
+}
+>>
+param(type, names) ::= <<
+<names; separator=", "> : <type>
+>>
+var_param(param) ::= "<param>"
+signature(params) ::= <<
+( <params; separator=", "> )
+>>
+
+procedure(id, sig, rtyp, body, decs, beg, ret) ::= <<
+static function <id><sig><rtyp>
+{
+    <decs; separator="\n">
+    <beg>
+    <ret>
+}
+>>
+
+return_type(type) ::= " : <type>"
+return_stmt(value)::= <<
+return <value>;
+>>
+inverted(expr) ::= "<expr> not"

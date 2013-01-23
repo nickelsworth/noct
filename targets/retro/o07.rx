@@ -1,0 +1,15 @@
+
+chain: o07' ( oberon07 report, section 10.2 )
+{{
+---reveal---
+  : ABS ( n-n )  ; (  TODO )
+  : ODD ( n-f ) 2 mod 1 = ;
+  : LEN ( v-n )  ; (  TODO )
+  : LSL ( xn-n ) ; (  TODO )
+  : ASR ( xn-n ) ; (  TODO )
+  : ROR ( xn-n ) ; (  TODO )
+
+   0 constant FALSE
+  -1 constant TRUE
+}}
+;chain
