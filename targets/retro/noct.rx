@@ -1,26 +1,37 @@
 
-chain: noct' ( compililation helpers for noct )
+( compililation helpers for noct )
+chain: noct'
+( -- FOR loop compiler --------------------------------------- )
 
-( ~~ assembler, as in meta.rx / assembler.rx ~~~~~~~~~~~~~~~ )
+{{ ( Helper functions )
+: relop dup 2 + @ 0 > [ &<= ] [ &>= ] if ;
+: start dup 4 + 1 , , ;
+: goal dup 3 + 1 , , ;
+: by dup 2 + 1 , , ;
+: quote dup 1 + 1 , , ;
+---reveal---
+: FOR ( start goal step quote - )
+  ahead [ 5 allot ] dip here over !
+  quote  ! by  ! goal  ! start  !
+  repeat [
+    start  @ goal  @ relop , 0;  drop
+    start  @ by  @  + start  !
+    quote  @ do
+  ] dip again
+  drop
+; immediate
+}}
 
-( vm: defines a new compiler word )
-: vm: ( n"- ) ( expects an opcode number on stack, will parse for name )
-   ` :        ( start new definition, parse for name )
-   ` ,        ( n-  write the opcode )
-;
+( -- CONST compiler ---------------------------------------- )
 
-( ngaro opcodes )
- 0 vm: nop,          1 vm: lit,          2 vm: dup,
- 3 vm: drop,         4 vm: swap,         5 vm: push,
- 6 vm: pop,          7 vm: loop,         8 vm: jump,
- 9 vm: ret,         10 vm: >jump,       11 vm: <jump,
-12 vm: !jump,       13 vm: =jump,       14 vm: @,
-15 vm: !,           16 vm: +,           17 vm: -,
-18 vm: *,           19 vm: /mod,        20 vm: and,
-21 vm: or,          22 vm: xor,         23 vm: <<,
-24 vm: >>,          25 vm: 0;           26 vm: 1+,
-27 vm: 1-,          28 vm: in,          29 vm: out,
-30 vm: wait,
+: CONST "( ``- ) reads to '`', then reads name. makes string or constant" :doc
+  13 ` accept
+  ( read up the the newline [asci char #13]. )
+  ( the reason is that we need to distinguish the number )
+  ( '5' from the string '"5"'. )
+  tib isNumber?
+    [ toNumber ` constant ]
+    [ ` string: ]
+  if ;
 
-  
 ;chain

@@ -1,0 +1,7 @@
+
+chain: Out'
+: Int "( nw- ) out put integer n, padded to width w" :doc
+  drop putn  ( TODO: number formatting ) ;
+: String "( $- ) output string" :doc puts ;
+: Ln "( - ) linefeed" cr ;
+;chain

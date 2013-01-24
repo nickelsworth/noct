@@ -2,6 +2,7 @@
 group Retro;
 emit(data) ::= "<data>"
 module(mod, imp, decs, beg) ::= <<
+needs noct' with noct'
 needs o07'
 <imp>
 chain: <mod>'
@@ -17,7 +18,7 @@ go
 ident(name) ::= "<name>"
 pass() ::= ""
 begin(block) ::= <<
-: BEGIN                   
+: BEGIN
   <block>
 ;
 >>
@@ -25,7 +26,7 @@ block(stmts) ::= <<
 <stmts; separator="\n">
 >>
 import_stmt(mods) ::= <<
-<mods:{ mod | needs <mod>' }; separator="\n"> 
+<mods:{ mod | needs <mod>' }; separator="\n">
 >>
 invoke(obj, args) ::= <<
 <if(args)><args> <endif><obj>
@@ -51,8 +52,7 @@ op_mod(a, b) ::= "<a> <b> mod"
 grouped(expr) ::= " <expr> "
 consts(consts) ::= "<consts>"
 declare_const(name, value) ::= <<
-^noct'CONST: <value> <name>
-
+CONST: <value> <name>
 >>
 declare(type, names, sym) ::= <<
 variables| <names:{n|<n>}; separator=" "> |

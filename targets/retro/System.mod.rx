@@ -1,12 +1,5 @@
 
-chain: Out'
-: Int "( nw- ) out put integer n, padded to width w" :doc
-  drop putn  ( TODO: number formatting ) ;
-: String "( $- ) output string" :doc puts ;
-: Ln "( - ) linefeed" cr ;
-;chain
-
-chain: System.mod'
+chain: System'
   : ADR  "( a-a ) address of a variable ( needed in oberon, but does nothing in retro )" :doc
   ;
   : SIZE "( t-n ) size of type T" :doc
