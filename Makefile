@@ -89,6 +89,7 @@ $(GEN)/%.hx: test/given/%.mod oberon.emitter targets/Haxe.stg
 	@cat $@
 
 $(GEN)/%.rx: test/given/%.mod oberon.emitter targets/Retro.stg
+	@rm -f $@
 	@$(JAVA) OberonEmitter targets/Retro.stg < $< | tail -n +1 > $@
 	@cat $@
 
