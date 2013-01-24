@@ -52,7 +52,8 @@ op_mod(a, b) ::= "<a> <b> mod"
 grouped(expr) ::= " <expr> "
 consts(consts) ::= "<consts>"
 declare_const(name, value) ::= <<
-CONST: <value> <name>
+CONST <name> <value>
+
 >>
 declare(type, names, sym) ::= <<
 variables| <names:{n|<n>}; separator=" "> |

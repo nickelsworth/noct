@@ -1,6 +1,16 @@
 
 ( compililation helpers for noct )
 chain: noct'
+: trace "( $- ) show a message and the data stack." :doc
+  .s space '| puts cr ;
+ 
+: readln "( ``-a ) read to end of line, return pointer to temp string" :docl
+  remapping   ( flag: accept newlines as distinct from spaces? )
+  &@ &off bi  ( remember the old value, then turn it off. )
+  10 ` accept ( read until newline. #13 or #10 will work. )
+  remapping ! ( restore old value of the remapping flag.  )
+  tib ;       ( put the string's address on the stack and return )
+
 ( -- FOR loop compiler --------------------------------------- )
 
 {{ ( Helper functions )
@@ -21,17 +31,16 @@ chain: noct'
   drop
 ; immediate
 }}
-
+ 
 ( -- CONST compiler ---------------------------------------- )
-
-: CONST "( ``- ) reads to '`', then reads name. makes string or constant" :doc
-  13 ` accept
-  ( read up the the newline [asci char #13]. )
-  ( the reason is that we need to distinguish the number )
-  ( '5' from the string '"5"'. )
-  tib isNumber?
-    [ toNumber ` constant ]
-    [ ` string: ]
-  if ;
-
+ 
+: CONST "( ``- ) reads name to space, then value to newline." :doc
+  create ( read the name and begin a definition with class .data )
+  readln ( read the value )
+  ( read characters up to the the linefeed [ascii char #10]. )
+  ( the reason for using a newline is so we can read strings )
+  ( that contain spaces or we can read a number. )
+  ( TODO : strip out the double quotes if it is a string. )
+  dup isNumber? [ toNumber ] [ keepString ] if
+  @last !d->xt ;  ( store the value in the new header and return )
 ;chain
