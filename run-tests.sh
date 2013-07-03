@@ -1,13 +1,17 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #
 # test suite for noct
 #
-# The Makefile runs this from the project root.
 
 gen=.gen
 test=test
 expect=$test/expect
 err=$gen/err.txt
+
+# force a 4-second limit on retro's runtime during the tests
+# (because if we generate invalid syntax, it can mess retro up,
+#  and retro will sit around waiting for more input )
+timelimit="timelimit -t2 -T2"
 
 # choose a language backend to test
 
@@ -54,7 +58,7 @@ for f in $test/given/*.mod ; do
      haxe)  haxe -cp $gen -cp targets/haxe/neko -x $name
             mv -f $name.n $gen
         ;;
-    retro)  retro --with $gen/$name.rx
+    retro)  $timelimit retro --with $gen/$name.rx
         ;;
         *)  echo "sorry, don't know how to run $1 yet."
         ;;
