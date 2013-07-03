@@ -5,7 +5,7 @@
 #     $ make emit emit.mod=/r/oberon/  emit.stg=.gen/Java.stg
 #
 #---------------------------------------------------------------
-JDK        = /usr/src/jdk1.7.0_10
+JDK        = /usr/local/openjdk7
 GEN        = .gen
 
 # free pascal:
