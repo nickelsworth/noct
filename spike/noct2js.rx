@@ -1,0 +1,206 @@
+
+( this file contains a code generator in retro     )
+( for a core imperative language similar to oberon )
+
+( || language |||||||||||||||||||||||||||||||||||||||||||||| )
+
+: TODO bye ; immediate
+: = @indent ; ( save a copy )
+: ^ !indent ; ( restore from saved )
+: > cr indent ++ ;
+: < cr indent -- ;
+: . cr ;
+: , puts ;
+: { ;
+: } ;
+: pub ( $ - ) dup ( TODO ) ;
+variable $modname ( used for defining public names )
+
+( || structure |||||||||||||||||||||||||||||||||||||||||||||| )
+
+( import helpers )
+( we have to be careful to not generate an extra comma here. )
+: (imports) ( array - ) dup len [ ", '" + @ , "'" ] iterd ;
+: (aliases) ( array - ) dup len [ ", "  + @ ,     ] iterd ;
+( TODO: refactor these. They're just basically looping through the array. )
+
+: module | modname [imports] [decls] [block] |
+  modname $modname !
+  = "define([ 'noct/core', 'noct/builtin'"
+  >   [imports] (imports)
+  < "],"
+  . "function( $corepas, $system"
+  >   [imports] (aliases)
+  < "){"
+  >   [decls] ";\n" sep
+  .   "if ($corepas.initialize(" modname ")) {"
+  >     [block]
+  <   "}"
+  < "});"
+  ^ ;
+
+( || definitions |||||||||||||||||||||||||||||||||||||||||||| )
+
+: public | name [definition] |
+  = [definition]
+  . $modname "['" name "'] = " name
+  ^ ;
+
+: def.type.record | pub? name super [fields] |
+  ( http://dojotoolkit.org/documentation/tutorials/1.9/declare )
+  = "var " name " = declare(null, " super ", {"
+  >   [fields] "\n;" sep
+  < "});"
+  ^ ;
+
+: def.type.record.field | name type |
+  = name ":" type
+  ^ ;
+
+: def.const |name val |
+  = "var " name " = " val ";"
+  ^ ;
+
+: def.var | name val |
+  = "var " name " = " val ";"
+  ^ ;
+
+( || statements ||||||||||||||||||||||||||||||||||||||||||||| )
+
+( == sequence ================ )
+
+: proc.def | name [argdefs] rtyp? [decls] [block] [rval]? |
+  = "function (" { [argdefs] "," sep } ") {"
+  >   [decls] "\n" sep
+  .   rtyp?  [ "var result;" ] ifTrue
+  .   [block]
+  .   rtyp?  [ "return " [rval] ";" ] ifTrue
+  .   [return]
+  .   pub? [ name publish ] ifTrue
+  < "}"
+  ^ ;
+
+: proc.argdef | name type | name ;
+
+: block | [stmts] |
+  = "{"
+  >   [stmts] "\n" sep
+  < "}"
+  ^ ;
+
+: stmt.invoke | [expr] |
+  = [expr] ";"
+  ^ ;
+
+( == mutation ================ )
+
+: stmt.assign | [chain] [expr] |
+  = [chain] "=" [expr] ";"
+  ^ ;
+
+( == repetition ============== )
+
+: stmt.repeat | [block] cond |
+  = "do" [block] "while (! " cond ");"
+  ^ ;
+
+: stmt.while | cond [block] [elifs] |
+  = "while (true) {"
+  >    "if (" cond ")" [block]
+  .    [elifs]
+  .    "else break;"
+  < "}"
+  ^ ;
+
+: stmt.while.elif | cond [block] |
+  = "else if (" cond ")" [block]
+  ^ ;
+
+( == selection =============== )
+
+( -- conditionals ------------ )
+
+: cond.eq | a b | "(" a ") === (" b ")" ;
+: cond.ne | a b | "(" a ") !== (" b ")" ;
+: cond.le | a b | "(" a ") <= (" b ")" ;
+: cond.ge | a b | "(" a ") >= (" b ")" ;
+: cond.lt | a b | "(" a ") < (" b ")" ;
+: cond.gt | a b | "(" a ") > (" b ")" ;
+( TODO: : cond.in | a b | "(" a ") IN (" b ")" ; )
+
+( -- boolean operators ------- )
+
+: op.and  | p q | "("  p ") && (" q ")" ;
+: op.xor  | p q | "!(" p ") != !(" q ")" ;
+: op.or   | p q | "("  p ") || (" q ")" ;
+: op.not  | p   | "!"  p ;
+
+
+( -- if statement ------------ )
+
+: stmt.if | cond [block] [elifs] [else] |
+  = "if (" cond ") " [block]
+  . [elifs]
+  . [else]
+  ^ ;
+
+: stmt.if.elif | cond [block] |
+  = "else if (" cond ") " [block]
+  ^ ;
+
+: stmt.if.else | cond [block] |
+  = "else " [block]
+  ^ ;
+
+( -- case statement ---------- )
+
+: stmt.case | term [options] [otherwise] |
+  = "switch (" term ") {"
+  . [options] "\n" sep
+  . [otherwise]
+  < "}"
+  ^ ;
+
+: cases | [valset] |
+  . [ "case" , ":" ] [valset] for
+  ;
+
+: stmt.case.option | [valset] [block] |
+  = [valset] ' cases
+  >   [block]
+  < "break;"
+  ^ ;
+
+: stmt.case.otherwise | [block] |
+  = "default:"
+  >   [block]
+  ^ ;
+
+( -- expressions ------------- )
+
+: op.positive | expr | "+(" expr ")" ;
+: op.negative | expr | "-(" expr ")" ;
+: op.inverted | expr | "~(" expr ")" ;
+
+: op.add | a b |  "(" a ") + (" b ")"    ;
+: op.sub | a b |  "(" a ") - (" b ")"    ;
+: op.rat | a b |  "(" a ") / (" b ")"    ;
+: op.mul | a b |  "(" a ") * (" b ")"    ;
+: op.div | a b | "((" a ") / (" b ")|0)" ;
+: op.mod | a b |  "(" a ") % (" b ")"    ;
+
+: op.group | expr | "(" expr ")" ;
+
+: op.is  | a b | "$noct a ") === " b ")" ;
+
+: lit.nil   "nul"   ;
+: lit.true  "true"  ;
+: lit.false "false" ;
+: lit.hex  | x | "0x" x hex putn ;
+: lit.int  | x | x decimal putn ;
+
+: chain.iden | name  | name ;
+: chain.qual | ns id | ns "." id ;
+: chain.attr | hd tl | hd "." tl ;
+
+(  TODO: implement $noct.typeOf )
