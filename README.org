@@ -13,7 +13,7 @@ The main files are:
  - =Oberon07.g= :: the grammar definition. ANTLR uses this to generate java code for a parser, which in turn builds up an [[http://en.wikipedia.org/wiki/Abstract_syntax_tree][abstract syntax tree]] of the input.
  - =OberonEmitter.g= :: a "tree grammar". ANTLR uses tree grammars to generate programs that walk the abstract syntax tree and process it in various ways. In this case, the process simply involves generating code.
 
-The =targets= directory, contains the templates for each target language, created with [[http://stringtemplate.org/][StringTemplate]].
+The =targets= directory contains the templates for each target language. These are created with [[http://stringtemplate.org/][StringTemplate]].
 
 Since the grammar and emitter are complete, and reusable, most of the work to be done here involves creating and updating templates. In addition, each target language requires the implementation of a small library, to provide the handful of primitives. See Section 10.2 in the language report for details.
 
